@@ -12,7 +12,7 @@ class TextCleaner():
         Removed groups: 
             r"[!?$%()*+,-./:;<=>\^_`{|}~]"
         '''
-        self.re_substitution_groups = [r'^RT+', r'^rt+', r'http\S+', r'&amp; ', r'^[@#]\w+']
+        self.re_substitution_groups = [r'^RT', r'^rt', r'http\S+', r'&amp; ', r'^[@#]\w+']
         self.text_abbrevs = { 'lol': 'laughing out loud', 'bfn': 'bye for now', 'cuz': 'because',
                             'afk': 'away from keyboard', 'nvm': 'never mind', 'iirc': 'if i recall correctly',
                             'ttyl': 'talk to you later', 'imho': 'in my honest opinion', 'brb': 'be right back',
@@ -36,6 +36,13 @@ class TextCleaner():
         4. remove punctuation
         5. remove special (utf-8) characters
         6. remove stop words
+
+
+        Run on one tweet at a time, for example:
+
+        cleaner = TextCleaner()
+        df['clean_tweets'] = df['full_text'].apply(lambda x: cleaner.clean_tweets(x, 5))
+
         '''
         df_tweet_text_sw = str(df_tweet_text)
 
