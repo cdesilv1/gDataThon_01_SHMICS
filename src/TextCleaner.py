@@ -8,15 +8,20 @@ class TextCleaner():
     a method for applying this to a list of text. 
     '''
     def __init__(self):
-        self.re_substitution_groups = [r'http\S+', r'&amp; ', r"[@#]", r"[!?$%()*+,-./:;<=>\^_`{|}~]"]
+        '''
+        Removed groups: 
+            r"[!?$%()*+,-./:;<=>\^_`{|}~]"
+        '''
+        self.re_substitution_groups = [r'^RT+', r'^rt+', r'http\S+', r'&amp; ', r'^[@#]\w+']
         self.text_abbrevs = { 'lol': 'laughing out loud', 'bfn': 'bye for now', 'cuz': 'because',
                             'afk': 'away from keyboard', 'nvm': 'never mind', 'iirc': 'if i recall correctly',
-                            'ttyl': 'talk to you later', 'imho': 'in my honest opinion', 'brb': 'be right back' }
+                            'ttyl': 'talk to you later', 'imho': 'in my honest opinion', 'brb': 'be right back',
+                            "fyi": "for your information" }
         self.grammar_abbrevs = {"isn't":"is not", "aren't":"are not", "wasn't":"was not", "weren't":"were not",
                              "haven't":"have not","hasn't":"has not","hadn't":"had not","won't":"will not",
                              "wouldn't":"would not", "don't":"do not", "doesn't":"does not","didn't":"did not",
                              "can't":"can not","couldn't":"could not","shouldn't":"should not","mightn't":"might not",
-                             "mustn't":"must not"}
+                             "mustn't":"must not", "'s":"s"}
 
 
     def clean_tweets(self, df_tweet_text, last_clean_step=6):
@@ -55,7 +60,7 @@ class TextCleaner():
             without_grammar_abbrevs = ' '.join([self.grammar_abbrevs.get(elem, elem) for elem in without_text_abbrevs.split()])
             
             joined_re_groups = '|'.join([group for group in self.re_substitution_groups])
-            clean_text = re.sub(joined_re_groups,' ',without_grammar_abbrevs)
+            clean_text = ' '.join([re.sub(joined_re_groups,' ',word) for word in without_grammar_abbrevs.split()])
         
         elif last_clean_step == 5:
             lower = df_tweet_text_sw.lower()
@@ -63,7 +68,7 @@ class TextCleaner():
             without_grammar_abbrevs = ' '.join([self.grammar_abbrevs.get(elem, elem) for elem in without_text_abbrevs.split()])
             
             joined_re_groups = '|'.join([group for group in self.re_substitution_groups])
-            without_re_groups = re.sub(joined_re_groups,' ',without_grammar_abbrevs)
+            without_re_groups = ' '.join([re.sub(joined_re_groups,' ',word) for word in without_grammar_abbrevs.split()])
 
             clean_text = re.sub(r'\W',' ',without_re_groups)
 
@@ -73,7 +78,7 @@ class TextCleaner():
             without_grammar_abbrevs = ' '.join([self.grammar_abbrevs.get(elem, elem) for elem in without_text_abbrevs.split()])
             
             joined_re_groups = '|'.join([group for group in self.re_substitution_groups])
-            without_re_groups = re.sub(joined_re_groups,' ',without_grammar_abbrevs)
+            without_re_groups = ' '.join([re.sub(joined_re_groups,' ',word) for word in without_grammar_abbrevs.split()])
 
             without_nontext = re.sub(r'\W',' ',without_re_groups)
 
@@ -84,4 +89,4 @@ class TextCleaner():
         one_space_separated_tweet = ' '.join([word for word in clean_text.split()])
 
         return one_space_separated_tweet
-    
+

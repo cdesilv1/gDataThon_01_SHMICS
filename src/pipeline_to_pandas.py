@@ -12,24 +12,6 @@ class pipelineToPandas():
     '''
     def __init__(self):
         self.base_path = '../data/'
-        '''
-        SELECT 
-            id AS tweet_id,
-            state,
-            search_term_key,
-            created_at AS tweet_date_created,
-            text AS tweet_text,
-            display_text_range AS tweet_text_range,
-            source,
-            user.`id` AS user_id,
-            user.`created_at` AS user_date_created,
-            user.`location` AS location,
-            user.`description` AS description,
-            user.`verified` AS user_verified
-        FROM sql_temp_table
-        WHERE
-            lang = 'en'
-        '''
 
     def load_json(self, fname):
         '''
@@ -47,6 +29,9 @@ class pipelineToPandas():
             format source from html to iPhone, Android, Web, Other
             format as datetime
         '''
+
+        # select english tweets
+        self.df_all = self.df_all[self.df_all['lang'] == 'en']
 
         # dropping duplicates
         self.df_all.drop_duplicates(subset='id', ignore_index=True, inplace=True)
