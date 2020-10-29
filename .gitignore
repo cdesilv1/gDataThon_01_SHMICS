@@ -1,3 +1,6 @@
+# added data to gitignore -Connor
+data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
