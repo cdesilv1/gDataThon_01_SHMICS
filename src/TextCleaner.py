@@ -9,7 +9,7 @@ class TextCleaner():
     '''
     def __init__(self):
         self.re_substitution_groups = [r'http\S+', r'&amp; ', r"[@#]", r"[!?$%()*+,-./:;<=>\^_`{|}~]"]
-        self. text_abbrevs = { 'lol': 'laughing out loud', 'bfn': 'bye for now', 'cuz': 'because',
+        self.text_abbrevs = { 'lol': 'laughing out loud', 'bfn': 'bye for now', 'cuz': 'because',
                             'afk': 'away from keyboard', 'nvm': 'never mind', 'iirc': 'if i recall correctly',
                             'ttyl': 'talk to you later', 'imho': 'in my honest opinion', 'brb': 'be right back' }
         self.grammar_abbrevs = {"isn't":"is not", "aren't":"are not", "wasn't":"was not", "weren't":"were not",
@@ -79,9 +79,9 @@ class TextCleaner():
 
             clean_text = ' '.join([word for word in without_nontext.split() if word not in stopwords])
         
-        words_greater_than_two_char = ' '.join([word for word in clean_text.split() if len(word) >= 3])
+        # words_greater_than_two_char = ' '.join([word for word in clean_text.split() if len(word) >= 3])
 
-        one_space_separated_tweet = ' '.join([word for word in words_greater_than_two_char.split()])
+        one_space_separated_tweet = ' '.join([word for word in clean_text.split()])
 
         return one_space_separated_tweet
-
+    

@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
+
 from datetime import datetime
+import re
+
 from bs4 import BeautifulSoup
 
 class pipelineToPandas():
@@ -45,8 +48,6 @@ class pipelineToPandas():
             format as datetime
         '''
 
-        # Select subset of columns
-
         # dropping duplicates
         self.df_all.drop_duplicates(subset='id', ignore_index=True, inplace=True)
 
@@ -89,7 +90,7 @@ class pipelineToPandas():
             return raw_range
 
     # Doesn't work yet 10/29
-    
+
     def _no_mentions_text(self, tup_range_series, raw_tweet_text_series):
         wo_mentions = np.empty(raw_tweet_text_series.shape, dtype='U256')
         for idx, tup in enumerate(tup_range_series):
