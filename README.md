@@ -78,6 +78,13 @@ Our plan was to curate 6 tweet subpopulation from dataset 1, spanning the politi
 </p>
 
 
+<p align="center">
+<img src="imgs/V_comp.png" width='400'/>
+</p>
+
+<p align="center">
+<text> Histogram of human hashtag annotation for tweet political preference.</text>
+</p>
 
 The segmented subpopulations of dataset 1 were used as training datasets for [GPT-2](https://github.com/openai/gpt-2), which generated new tweets that were aggregated to new datasets. 
 
