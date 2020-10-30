@@ -69,6 +69,10 @@ Our data consists of two datasets; one, a collection of raw micro-blog posts (tw
 
 Our plan was to curate 6 tweet subpopulation from dataset 1, spanning the political spectrum (pro-Trump/pro-Biden), the partisan intentsity spectrum (attack/non-attack), and sentiment spectrum (compound score, [VADER](https://github.com/cjhutto/vaderSentiment)). Political sentiment was judged by our team, manually annotating associated hashtags as either pro-Trump (+1), pro-Biden (-1) or neutral (0). After annotation, the hashtags associated with each tweet were summed to give a composite score, ranging from [-1, 1]. Partisan intensity of each tweet was decided via a custom attack/non-attack classifier that was trained on dataset 2 (detailed in models section), with a score of 0 - non-attack, and 1-attack. Sentiment was calculated with the VADER algorithm, a lexicon-based sentiment analyzer, providing a compound score ranging from [-1,1].
 
+The segmented subpopulations of dataset 1 were used as training datasets for [GPT-2](https://github.com/openai/gpt-2), which generated new tweets that were aggregated to new datasets. 
+
+Before segmenting our data for GPT-2 generation, we took a look at the data. For dataset 1, many of the tweets had neutral hashtags (~96%), with 2.5% favorible to biden, and 1.5% favoring trump. 
+
 <p align="center">
 <img src="imgs/support_of_candidates.png" width='400'/>
 </p>
@@ -77,16 +81,43 @@ Our plan was to curate 6 tweet subpopulation from dataset 1, spanning the politi
 <text> Histogram of human hashtag annotation for tweet political preference.</text>
 </p>
 
+Analysis of these tweets with VADER provided more insight to the distribution of sentimental laoding.
 
 <p align="center">
 <img src="imgs/V_comp.png" width='400'/>
 </p>
 
 <p align="center">
-<text> Histogram of human hashtag annotation for tweet political preference.</text>
+<text> Vader componenet scores. Positive, negative and neutral as a fraction of tokens in tweet.</text>
 </p>
 
-The segmented subpopulations of dataset 1 were used as training datasets for [GPT-2](https://github.com/openai/gpt-2), which generated new tweets that were aggregated to new datasets. 
+<p align="center">
+<img src="imgs/V_other.png" width='400'/>
+</p>
+
+<p align="center">
+<text> Vader compound sentiment score. The compound score takes token sentiment and context into consideration, ranging from negative, -1, to positive, 1.</text>
+</p>
+
+The distribution of attack/non-attack social media posts from our sourced dataset was roughly 1:5.
+
+<p align="center">
+<img src="imgs/attack_training.png" width='400'/>
+</p>
+
+<p align="center">
+<text>Social media posts labeled attack/non-attack in our sourced dataset.</text>
+</p>
+
+Using our trained Multinomial Naive-Bayes model, we classified the tweets from dataset 1.
+
+<p align="center">
+<img src="imgs/attack_given.png" width='400'/>
+</p>
+
+<p align="center">
+<text>Distribution of attack/non-attack labels given to dataset 1 from our </text>
+</p>
 
 - Modeling
 
