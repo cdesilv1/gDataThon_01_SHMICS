@@ -172,4 +172,4 @@ In a short amount of time with a relatively small dataset of tweets with a polit
 
 * GPT-2 HyperParameter tuning
 * Tuning of tweet selection for the most highly charged examples tous
-* deployment of bot on twitter, and logic for selecting users to target
+* deployment of bot on twitter, and logic for selecting users to target 
