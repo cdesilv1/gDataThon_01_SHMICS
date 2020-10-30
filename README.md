@@ -39,15 +39,36 @@ CRISP-DM process:
 
 Research Q: 
 
-Advances is Machine Learning text-generation: An exploration in inflammatory political micro-blogging
+Advances is Machine Learning text-generation: An exploration in inflammatory political social media posts
 
 - Business Understanding
 
 Slowly, everything in our everyday lives is going online. Roughly 2/5 [41%](https://www.wordstream.com/blog/ws/2019/04/04/ecommerce-statistics) of US consumers order 1-2 packages from Amazon per week and a whopping 83% have made one purchase from Amazon within the last 6 months. This transfer to digital-life has come to the fore during the COVID-19 pandemic. Work, social events, even education has transfered online with the focus of social distancing. Although beneficial to curb the pandemic, social isolationism makes it difficult to keep meaningful social relationships, and many result to communication through digital media.
 
-Digital media is the focus of our
+Digital media is susceptible to misinformation, as have all become acutely aware in this election season, but couldn't humans spot the difference between artificially generated posts and those by humans? Honest and open dissemination of information is critical to American discourse, which pervaids all business transactions. The ability to artifically generate text for the purpose of insighting... (relate to 1. raising the temperature of civil discourse, 2. honesty in business transactiosn, 3. )
+
 
 - Data Understanding
+
+Datasets:
+
+- ~140k tweets pertaining to 2020 Presidential Election [link](https://drive.google.com/file/d/1rBJBWWTF9lvKs4pY-PF9Wad91yiW45ol/view?usp=sharing)
+- 5k social media posts from politicians' social media accounts, along with human judgements to about the nature of the tweet, see list below [link](https://www.kaggle.com/crowdflower/political-social-media-posts)
+
+  - attack: the message attacks another politician
+  - constituency: the message discusses the politician's constituency
+  - information: an informational message about news in government or the wider U.S.
+  - media: a message about interaction with the media
+  - mobilization: a message intended to mobilize supporters
+  - other: a catch-all category for messages that don't fit into the other
+  - personal: a personal message, usually expressing sympathy, support or condolences, or other personal opinions
+  - policy: a message about political policy
+  - support: a message of political support )
+
+Our plan was to curate 4 tweet subpopulation from dataset 1, spanning each corner of
+
+Our data consists of two datasets; one, a collection of raw micro-blog posts (tweets) with associated meta-data, and two, a collection of social media posts from politicians along with human judgements on the nature of the post (see above). The second dataset was used to train a machine learning model to detect 'attack/non-attack' judged social posts and applied to the first dataset. This provided a 'tweet intensity' feature to our initial dataset.  
+
 - Data Preparation
 - Modeling
 - Evaluation
