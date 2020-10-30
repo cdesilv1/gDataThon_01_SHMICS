@@ -65,7 +65,7 @@ Datasets:
   - policy: a message about political policy
   - support: a message of political support )
 
-Our plan was to curate 4 tweet subpopulation from dataset 1, spanning each corner of
+Our plan was to curate 4 tweet subpopulation from dataset 1, spanning the political spectrum (pro-Trump/pro-Biden) and the partisan intentsity spectrum (attack/non-attack). Political sentiment was judged by our team, manually annotating associated hashtags as either pro-Trump (+1), pro-Biden (-1) or neutral (0). After annotation, the hashtags associated with each tweet were summed to give a composite score, ranging from [-1, 1]. Partisan intensity of
 
 Our data consists of two datasets; one, a collection of raw micro-blog posts (tweets) with associated meta-data, and two, a collection of social media posts from politicians along with human judgements on the nature of the post (see above). The second dataset was used to train a machine learning model to detect 'attack/non-attack' judged social posts and applied to the first dataset. This provided a 'tweet intensity' feature to our initial dataset.  
 
