@@ -45,7 +45,7 @@ Advances is Machine Learning text-generation: An exploration in inflammatory pol
 
 Slowly, everything in our everyday lives is going online. Roughly 2/5 [41%](https://www.wordstream.com/blog/ws/2019/04/04/ecommerce-statistics) of US consumers order 1-2 packages from Amazon per week and a whopping 83% have made one purchase from Amazon within the last 6 months. This transfer to digital-life has come to the fore during the COVID-19 pandemic. Work, social events, even education has transfered online with the focus of social distancing. Although beneficial to curb the pandemic, social isolationism makes it difficult to keep meaningful social relationships, and many result to communication through digital media.
 
-Digital media is susceptible to misinformation, as have all become acutely aware in this election season, but couldn't humans spot the difference between artificially generated posts and those by humans? Honest and open dissemination of information is critical to American discourse, which pervaids all business transactions. The ability to artifically generate text for the purpose of insighting... (relate to 1. raising the temperature of civil discourse, 2. honesty in business transactiosn, 3. )
+Digital media is susceptible to misinformation, as have all become acutely aware in this election season, but couldn't humans spot the difference between artificially generated posts and those by humans? Honest and open dissemination of information is critical to American discourse, which pervaids all business transactions. The ability to artifically generate text for the purpose of increasing the temperature of civil discourse can have a significant impact on business public relations.
 
 
 - Data Understanding/Data Preparation
@@ -116,7 +116,7 @@ Using our trained Multinomial Naive-Bayes model, we classified the tweets from d
 </p>
 
 <p align="center">
-<text>Distribution of attack/non-attack labels given to dataset 1 from our </text>
+<text>Distribution of attack/non-attack labels given to dataset 1 from our classifier.</text>
 </p>
 
 - Modeling
