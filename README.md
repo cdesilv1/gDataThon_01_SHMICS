@@ -35,20 +35,18 @@ Business area:
 
 # Introduction
 
-CRISP-DM process:
-
-Research Q: 
+## Research Question 
 
 Advances is Machine Learning text-generation: An exploration in inflammatory political social media posts
 
-- Business Understanding
+## Business Understanding
 
 Slowly, everything in our everyday lives is going online. Roughly 2/5 [41%](https://www.wordstream.com/blog/ws/2019/04/04/ecommerce-statistics) of US consumers order 1-2 packages from Amazon per week and a whopping 83% have made one purchase from Amazon within the last 6 months. This transfer to digital-life has come to the fore during the COVID-19 pandemic. Work, social events, even education has transfered online with the focus of social distancing. Although beneficial to curb the pandemic, social isolationism makes it difficult to keep meaningful social relationships, and many result to communication through digital media.
 
 Digital media is susceptible to misinformation, as have all become acutely aware in this election season, but couldn't humans spot the difference between artificially generated posts and those by humans? Honest and open dissemination of information is critical to American discourse, which pervaids all business transactions. The ability to artifically generate text for the purpose of increasing the temperature of civil discourse can have a significant impact on business public relations.
 
 
-- Data Understanding/Data Preparation
+## Data Understanding/Data Preparation
 
 Datasets:
 
@@ -84,7 +82,7 @@ Before segmenting our data for GPT-2 generation, we took a look at the data. For
 Analysis of these tweets with VADER provided more insight to the distribution of sentimental laoding.
 
 <p align="center">
-<img src="imgs/V_comp.png" width='400'/>
+<img src="imgs/V_comp.png" width='500'/>
 </p>
 
 <p align="center">
@@ -92,7 +90,7 @@ Analysis of these tweets with VADER provided more insight to the distribution of
 </p>
 
 <p align="center">
-<img src="imgs/V_other.png" width='400'/>
+<img src="imgs/V_other.png" width='500'/>
 </p>
 
 <p align="center">
@@ -102,7 +100,7 @@ Analysis of these tweets with VADER provided more insight to the distribution of
 The distribution of attack/non-attack social media posts from our sourced dataset was roughly 1:5.
 
 <p align="center">
-<img src="imgs/attack_training.png" width='400'/>
+<img src="imgs/attack_training.png" width='500'/>
 </p>
 
 <p align="center">
@@ -112,113 +110,66 @@ The distribution of attack/non-attack social media posts from our sourced datase
 Using our trained Multinomial Naive-Bayes model, we classified the tweets from dataset 1.
 
 <p align="center">
-<img src="imgs/attack_given.png" width='400'/>
+<img src="imgs/attack_given.png" width='500'/>
 </p>
 
 <p align="center">
 <text>Distribution of attack/non-attack labels given to dataset 1 from our classifier.</text>
 </p>
 
-- Modeling
+## Modeling
+
+As part of the effort to identify higher-intensity tweets, an external dataset at Kaggle with political tweets with labels including 'attack', 'mobilization', 'personal', 'policy' was acquired. The tweet text in the dataset was vectorized using TFIDF, and a corresponding binary target value for 'attack' was assigned (1 or 0, depending on whether it was labelled as 'attack' in the dataset). Scores from 5-fold cross-validation for Precision, Recall, and F1 score were obtained from the following models: Logistic Regression, Multinomial NB, Random Forest, XGBoost
 
 
+The scores are somewhat low, which points to some difficulty of identifying tweet intent from word content. However, clearly Multinomial Naive Bayes performs best here, and this was used to predict which tweets in the main dataset we are analyzing for this project are 'attack' and higher-intensity. MNB was trained on the whole 'attack' labelled dataset and used to label which tweets are 'attack' in the given dataset.
 
-Multinomial nieve Bayes classifier, used to classify as attack/non-attack
+<p align="center">
+<img src="imgs/mod_results.png" width='500'/>
+</p>
+
+<p align="center">
+<text>Classifier model selection. We chose to move forward with Multinomial Niave-Bayes.</text>
+</p>
+
+## Evaluation
 
 
+### Subpopulation 1: Attack tweets with low sentiment (compound score < 0)
 
-- Evaluation
-- Deployment
+The following tweets were generated from a GPT-2 model trained on tweets classified as 'attack' or tweets with low sentiment score and posted to Twitter via the Tweepy library:
+
+<p align="center">
+<img src="imgs/tweets.png" width='500'/>
+</p>
+
+### Subpopulation 2: Pro-Trump human annoted
+
+The following tweets were generated from a GPT-2 model trained on tweets annotated by human hashtag annotation.
 
 
+- @JedediahBila "What does it say on the tin? Vote, or we cut it off." #VoteTrump2020NowMoreThanEver
+
+- @Pflax1 @H_A_Kamala #blacklivesmatter #BLM #LatinosforTrump &amp; @realDonaldTrump #MakeAmericaGreatAgain @realDonaldTrump2020 #WalkAway #WalkAwayFromDemocrats
+
+- Just landed in Georgia! The people of this great state know that four more years of President @realDonaldTrump means four more years of America first!  #MAGA
 
 
+- China OWNS the Biden Crime Family 
+You know, besides Obama, Biden, Clintons and Obamagate??
+#BidenCrimeFamily
 
-# Code (50% of grade)
 
-## General
+- In just 3 and a half years, we have secured America's Borders, rebuilt the awesome power of the U.S. Military, obliterated the ISIS caliphate, fixed our disastrous Trade Deals, and brought JOBS back home to America – and back to MINNESOTA! #MAGA
+Just departed the White House for Minnesota! #MAGA
 
-- The project plan identifies criteria for successful completion of the project.
-- README contains a concise project description and addresses each step in the CRISP-DM* process from business understanding to deployment 
-- All assumptions are documented and next steps are laid out. 
-- README and other project documentation is well-written, contains no spelling or grammatical errors, and ready for immediate review by potential employers 
-- All files (including slides) are organized into directories and their locations are explained in the README 
-- Final product addresses original business problem or research question.
 
-## Use Case Understanding
+# Conclusion
 
-- The project has the potential to provide benefit to users beyond just being interesting. (Is this project useful?) 
-- Practical use is well articulated and demonstrated by project and project notes. (How well is this being explained as useful?) 
-- The data set is put to good use in terms of practical application. (Is this the best use of your data set?)
+In a short amount of time with a relatively small dataset of tweets with a political focus on the election, we were able to demonstrate PoC using GPT-2 to create realistic tweets that have a highly charged sentiment for either candidate. 
 
-## Data Prep
+## Next Steps
 
-- The data preparation pipeline is documented in executable code contained in .py files. 
-
-DATA SOURCE:
-- Data source is clearly identified and credited. 
-- Clear instructions are provided for obtaining the data and replicating the data preparation process. 
-- Scripts are provided for obtaining the public data.
-- A small representative shard of example data is included in the repository.
-
-## Python Code
-
-- All code is organized into functions and/or classes
-- All Python code complies with PEP8 and passes pycode style. Docstrings are present and comply with Numpy or Google docstring style. Type annotations may be used. All inline comments are accurate and useful.
-- All data preparation, modeling, and evaluation steps are documented in code. Another DSI graduate could reproduce the project’s results simply by following the instructions referenced in the README file.
-- The repository is clean and does not contain unneccessary derived files and directories.  
-- Modeling is done in .py files and not in jupyter notebooks
-
-# Presentation (40%)
-
-## Project Question/Goal
-
-- Articulately and clearly describes the practical case of the project 
-- Clearly articulates a question to be answered by the project  
-- Identifies and articulates potential next steps
-
-## EDA
-
-- Identifies and describes the data source, crediting the data sources
-- Demonstrates sufficient amount of analysis to properly identify data trends
-- Demonstrates an understanding of the data as it relates to the project question
-
-## Analysis (e.g. cleaning pipeline, modeling, validation of model, presentation of results)
-
-- Chooses speaking points that are considered technologically interesting to the data science community; avoids topics that are considered common knowledge or uninteresting analysis
-- Articulates metrics used for model validation 
-- Presents modeling results in a way that is understandable to a technical and non-technical audience alike
-- Final product addresses original business problem or research question.
-
-## Visual Presentation & Presentation Skills
-
--------------------Visual Presentation-----------------
-- Slides have no spelling or grammatical errors 
-- Slide content is logically organized and easy to read/understand 
-- Slides contain appropriate graphics to enhance understanding
-- Slides enhance and do not detract from the project presentation (no meme rule) 
-- Slides contain a link to student's github in summary 
--------------------Presentation Skills-----------------
-- Maintains appropriate eye contact 
-- Does not use a script 
-- Does not have long pauses or excessive filler words 
-- Demonstrates excitement and engagement with the topic 
-- Demonstrates appropriate body language
-- Always uses technical and professional communication and avoids slang/casual phrases 
-- Technical content is factual and accurate
-- Presentation does not exceed allotted 5 minute time limit
-
-# Creativity (10%)
-
-## Creativity Skills
-
-Chooses points that are considered technologically interesting to the data science community; avoids topics that are considered common knowledge or uninteresting analysis
-
-*Judge for Creativity has the liberty to award points at discretion*
-
-Some Examples of Creativity:
-- Original Strategies to the Data Science Project
-- Unique Approaches to the Use of the Data 
-- Original use of algorithms
-- Novel use of libraries
-- Unique and/or interactive visualizations
+* GPT-2 HyperParameter tuning
+* Tuning of tweet selection for the most highly charged examples tous
+* deployment of bot on twitter, and logic for selecting users to target
