@@ -48,12 +48,12 @@ Slowly, everything in our everyday lives is going online. Roughly 2/5 [41%](http
 Digital media is susceptible to misinformation, as have all become acutely aware in this election season, but couldn't humans spot the difference between artificially generated posts and those by humans? Honest and open dissemination of information is critical to American discourse, which pervaids all business transactions. The ability to artifically generate text for the purpose of insighting... (relate to 1. raising the temperature of civil discourse, 2. honesty in business transactiosn, 3. )
 
 
-- Data Understanding
+- Data Understanding/Data Preparation
 
 Datasets:
 
-- ~140k tweets pertaining to 2020 Presidential Election [link](https://drive.google.com/file/d/1rBJBWWTF9lvKs4pY-PF9Wad91yiW45ol/view?usp=sharing)
-- 5k social media posts from politicians' social media accounts, along with human judgements to about the nature of the tweet, see list below [link](https://www.kaggle.com/crowdflower/political-social-media-posts)
+1. ~140k tweets pertaining to 2020 Presidential Election [link](https://drive.google.com/file/d/1rBJBWWTF9lvKs4pY-PF9Wad91yiW45ol/view?usp=sharing)
+2. 5k social media posts from politicians' social media accounts, along with human judgements to about the nature of the tweet, see list below [link](https://www.kaggle.com/crowdflower/political-social-media-posts)
 
   - attack: the message attacks another politician
   - constituency: the message discusses the politician's constituency
@@ -65,14 +65,34 @@ Datasets:
   - policy: a message about political policy
   - support: a message of political support )
 
-Our plan was to curate 4 tweet subpopulation from dataset 1, spanning the political spectrum (pro-Trump/pro-Biden) and the partisan intentsity spectrum (attack/non-attack). Political sentiment was judged by our team, manually annotating associated hashtags as either pro-Trump (+1), pro-Biden (-1) or neutral (0). After annotation, the hashtags associated with each tweet were summed to give a composite score, ranging from [-1, 1]. Partisan intensity of
-
 Our data consists of two datasets; one, a collection of raw micro-blog posts (tweets) with associated meta-data, and two, a collection of social media posts from politicians along with human judgements on the nature of the post (see above). The second dataset was used to train a machine learning model to detect 'attack/non-attack' judged social posts and applied to the first dataset. This provided a 'tweet intensity' feature to our initial dataset.  
 
-- Data Preparation
+Our plan was to curate 6 tweet subpopulation from dataset 1, spanning the political spectrum (pro-Trump/pro-Biden), the partisan intentsity spectrum (attack/non-attack), and sentiment spectrum (compound score, [VADER](https://github.com/cjhutto/vaderSentiment)). Political sentiment was judged by our team, manually annotating associated hashtags as either pro-Trump (+1), pro-Biden (-1) or neutral (0). After annotation, the hashtags associated with each tweet were summed to give a composite score, ranging from [-1, 1]. Partisan intensity of each tweet was decided via a custom attack/non-attack classifier that was trained on dataset 2 (detailed in models section), with a score of 0 - non-attack, and 1-attack. Sentiment was calculated with the VADER algorithm, a lexicon-based sentiment analyzer, providing a compound score ranging from [-1,1].
+
+<p align="center">
+<img src="imgs/support_of_candidates.png" width='400'/>
+</p>
+
+<p align="center">
+<text> Histogram of human hashtag annotation for tweet political preference.</text>
+</p>
+
+
+
+The segmented subpopulations of dataset 1 were used as training datasets for [GPT-2](https://github.com/openai/gpt-2), which generated new tweets that were aggregated to new datasets. 
+
 - Modeling
+
+
+
+Multinomial nieve Bayes classifier, used to classify as attack/non-attack
+
+
+
 - Evaluation
 - Deployment
+
+
 
 
 
