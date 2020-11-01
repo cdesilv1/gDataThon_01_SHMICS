@@ -1,10 +1,40 @@
-import pandas as pd
-import numpy as np
-
+# Python builtin libraries
 from datetime import datetime
 import re
 
+# External libraries
+import pandas as pd
+import numpy as np
 from bs4 import BeautifulSoup
+
+'''
+# ETL steps
+
+- Get data from Source:
+    1. 
+
+- load data from .jsonl file in Google drive
+- Apply Transforms:
+
+    1. Select only english tweets
+    2. Select only tweets with user description
+    3. Drop unrelevant columns
+    4. Apply Clustering to user descriptions and apply label (for hard-clustering) or latent features (soft)
+    5. Apply Vector transform, apply compound score
+    6. Apply pro-Trump/pro-Biden score based on hashtag dictionary, maybe to user desc text also
+    7. Apply attach/non-attack classifier
+    
+    
+- Load to usable form:
+
+    1. Subset dataset to 4 subsets: proTrump/highInt, proTrump/lowInt, proBiden/highInt, proBiden/lowInt
+    2. Save each as a jsonl file, format "1_1" for proTrump/highInt (if time, save to SQL/Lamda API)
+    
+
+- Script to run GPT-2 on each subset
+    1. Could use [this medium post](https://medium.com/@ngwaifoong92/beginners-guide-to-retrain-gpt-2-117m-to-generate-custom-text-content-8bb5363d8b7f) for guidance
+    2. Save generated texts in files with tweet_gen_ID for ref.
+'''
 
 class pipelineToPandas():
     '''
