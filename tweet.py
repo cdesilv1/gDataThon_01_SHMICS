@@ -11,7 +11,14 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
-def make_tweet(api, filenames:list):
+def get_fnames_helper()->list:
+    # get fnames from helper
+    with open('count_logger.json', 'r') as fread:
+        read_json = json.load(fread)
+        fnames = list(read_json.keys())
+        return fnames
+
+def make_tweet(api, filenames:list=get_fnames_helper()):
     logger.info("Deciding on tweet type to post")
     file_to_select_from = random.choice(filenames)
 
@@ -41,7 +48,7 @@ def make_tweet(api, filenames:list):
 def main():
     api = create_api()
     while True:
-        make_tweet(api, ['FILENAMES HERE'])
+        make_tweet(api)
         time.sleep(3600)
 
 if __name__ == "__main__":
