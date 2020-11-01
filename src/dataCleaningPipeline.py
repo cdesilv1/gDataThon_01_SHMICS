@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup
     2. Select only tweets with user description (?)
     3. Drop unrelevant columns
     4. Apply Clustering to user descriptions and apply label (for hard-clustering) or latent features (soft)
-    5. Apply Vector transform, apply compound score
+    5. Apply Vader transform, apply compound score
     6. Apply pro-Trump/pro-Biden score based on hashtag dictionary, maybe to user desc text also
     7. Apply attach/non-attack classifier
     
@@ -46,19 +46,21 @@ class pipelineToPandas():
     def __init__(self):
         self.base_path = '../data/'
 
-    def load_json(self, fname, chunk=True):
+    def load_json(self, fname, chunk=True, chunk_size = 10000):
         '''
         Loads json file to pandas df
 
         INPUT: fname <str>: File name
         '''
         self.chunk = chunk
+        self.chunk_size = chunk_size
+
         if chunk:
-            self.df_chunk_iter = pd.read_json(f'{self.base_path}{fname}', lines=True, chunksize=10000)
+            self.df_chunk_iter = pd.read_json(f'{self.base_path}{fname}', lines=True, chunksize=chunk_size)
 
         else:
             self.df_raw = pd.read_json(f'{self.base_path}{fname}', lines=True)
-
+    
     def clean_df(self):
         '''
         Clean df. This includes,
@@ -73,16 +75,26 @@ class pipelineToPandas():
         if self.chunk:
             # select english tweets
             for chunk_id, chunk in enumerate(self.df_chunk_iter):
+                # Subset columns
                 chunk = chunk[cols_to_keep]
 
+                # Select english tweets
                 chunk = chunk[chunk['lang'] == 'en']
 
+                # Drop duplicate tweets
                 chunk.drop_duplicates(subset='id', ignore_index=True, inplace=True)
 
+                # Grab user description
                 chunk['user_desc'] = [chunk['user'][ind].get('description') for ind in range(len(chunk))]
                 # chunk = chunk[chunk['user_desc'] != '']
 
+                # Grab hashtags
                 chunk['hashtags'] = [chunk['entities'][ind].get('hashtags') for ind in range(len(chunk))]
+
+                # Return chunk
+
+                # print update
+                print(f'Cleaning chunks:\t{chunk_id+1} of {(self.chunk_size // len(chunk))+1} clean')
 
         else:
             # select english tweets
@@ -113,6 +125,30 @@ class pipelineToPandas():
 
             # format datetime cols
             self.df_all['tweet_date_created'] = pd.to_datetime(self.df_all['created_at'])
+
+    def _subset_tweets(self, df):
+        '''
+        Subsets columns, selects english, drops duplicates, grabs user_desc & hashtags for each tweet
+        '''
+
+        cols_to_keep = ['id', 'full_text', 'source', 'entities', 'user', 'lang']
+
+        # Subset columns
+        df = df[cols_to_keep]
+
+        # Select english tweets
+        df = df[df['lang'] == 'en']
+
+        # Drop duplicate tweets
+        df.drop_duplicates(subset='id', ignore_index=True, inplace=True)
+
+        # Grab user description
+        df['user_desc'] = [df['user'][ind].get('description') for ind in range(len(df))]
+
+        # Grab hashtags
+        df['hashtags'] = [df['entities'][ind].get('hashtags') for ind in range(len(df))]
+
+        
 
     def _get_atag_text(self, tweet_text):
         a_tag = BeautifulSoup(tweet_text).find('a')
