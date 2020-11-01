@@ -11,13 +11,16 @@ from bs4 import BeautifulSoup
 # ETL steps
 
 - Get data from Source:
-    1. 
+    1. Info from this gist https://gist.github.com/tanaikech/f0f2d122e05bf5f971611258c22c110f
+    2. For us:
+        - Move 'download_full_ds.sh' to 'data' folder
+        - Execute script
 
 - load data from .jsonl file in Google drive
 - Apply Transforms:
 
     1. Select only english tweets
-    2. Select only tweets with user description
+    2. Select only tweets with user description (?)
     3. Drop unrelevant columns
     4. Apply Clustering to user descriptions and apply label (for hard-clustering) or latent features (soft)
     5. Apply Vector transform, apply compound score
@@ -43,13 +46,18 @@ class pipelineToPandas():
     def __init__(self):
         self.base_path = '../data/'
 
-    def load_json(self, fname):
+    def load_json(self, fname, chunk=True):
         '''
         Loads json file to pandas df
 
         INPUT: fname <str>: File name
         '''
-        self.df_all = pd.read_json(f'{self.base_path}{fname}', lines=True)
+        self.chunk = chunk
+        if chunk:
+            self.df_chunk_iter = pd.read_json(f'{self.base_path}{fname}', lines=True, chunksize=10000)
+
+        else:
+            self.df_raw = pd.read_json(f'{self.base_path}{fname}', lines=True)
 
     def clean_df(self):
         '''
@@ -60,34 +68,51 @@ class pipelineToPandas():
             format as datetime
         '''
 
-        # select english tweets
-        self.df_all = self.df_all[self.df_all['lang'] == 'en']
+        cols_to_keep = ['id', 'full_text', 'source', 'entities', 'user', 'lang']
 
-        # dropping duplicates
-        self.df_all.drop_duplicates(subset='id', ignore_index=True, inplace=True)
+        if self.chunk:
+            # select english tweets
+            for chunk_id, chunk in enumerate(self.df_chunk_iter):
+                chunk = chunk[cols_to_keep]
 
-        # Eliminating mentions, dropping 
-        range_as_tuple = self.df_all['display_text_range'].apply(self._format_text_range) 
-        self.df_all['tweet_text_wo_mentions'] = self._no_mentions_text(
-            range_as_tuple,
-            self.df_all['full_text']
-        )
-        self.df_all.drop(['display_text_range'], axis=1, inplace=True)  
+                chunk = chunk[chunk['lang'] == 'en']
 
-        # formatting source
-        self.df_all['source_text'] = self.df_all['source'].apply(lambda x: self._get_atag_text(x))
-        self.df_all.drop('source', axis=1, inplace=True)
-        source_class_dict = {'Twitter for iPhone': 'iPhone', 'Twitter for Android': 'Android',
-                    'Twitter Web App': 'Web', 'Twitter for iPad': 'iPad'}
-        self.df_all['source_text'] = self.df_all['source_text'].replace(source_class_dict)
-        self.df_all['source_text'].where(
-            self.df_all['source_text'].apply(lambda x: x in source_class_dict.values()),
-            'Other',
-            inplace=True
-        )
+                chunk.drop_duplicates(subset='id', ignore_index=True, inplace=True)
 
-        # format datetime cols
-        self.df_all['tweet_date_created'] = pd.to_datetime(self.df_all['created_at'])
+                chunk['user_desc'] = [chunk['user'][ind].get('description') for ind in range(len(chunk))]
+                # chunk = chunk[chunk['user_desc'] != '']
+
+                chunk['hashtags'] = [chunk['entities'][ind].get('hashtags') for ind in range(len(chunk))]
+
+        else:
+            # select english tweets
+            self.df_all = self.df_all[self.df_all['lang'] == 'en']
+
+            # dropping duplicates
+            self.df_all.drop_duplicates(subset='id', ignore_index=True, inplace=True)
+
+            # Eliminating mentions, dropping 
+            range_as_tuple = self.df_all['display_text_range'].apply(self._format_text_range) 
+            self.df_all['tweet_text_wo_mentions'] = self._no_mentions_text(
+                range_as_tuple,
+                self.df_all['full_text']
+            )
+            self.df_all.drop(['display_text_range'], axis=1, inplace=True)  
+
+            # formatting source
+            self.df_all['source_text'] = self.df_all['source'].apply(lambda x: self._get_atag_text(x))
+            self.df_all.drop('source', axis=1, inplace=True)
+            source_class_dict = {'Twitter for iPhone': 'iPhone', 'Twitter for Android': 'Android',
+                        'Twitter Web App': 'Web', 'Twitter for iPad': 'iPad'}
+            self.df_all['source_text'] = self.df_all['source_text'].replace(source_class_dict)
+            self.df_all['source_text'].where(
+                self.df_all['source_text'].apply(lambda x: x in source_class_dict.values()),
+                'Other',
+                inplace=True
+            )
+
+            # format datetime cols
+            self.df_all['tweet_date_created'] = pd.to_datetime(self.df_all['created_at'])
 
     def _get_atag_text(self, tweet_text):
         a_tag = BeautifulSoup(tweet_text).find('a')
