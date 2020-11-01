@@ -6,6 +6,7 @@ import re
 import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 '''
 # ETL steps
@@ -39,9 +40,9 @@ from bs4 import BeautifulSoup
     2. Save generated texts in files with tweet_gen_ID for ref.
 '''
 
-class pipelineToPandas():
+class tweetCleaner():
     '''
-    Class that performs ETL from datalake json file to structured pandas dataframe.
+    Class that performs ETL from datalake json file to structured dataframe.
     '''
     def __init__(self):
         self.base_path = '../data/'
@@ -63,68 +64,48 @@ class pipelineToPandas():
     
     def clean_df(self):
         '''
-        Clean df. This includes,
-            dropping duplicate rows (based on tweet_id)
-            eliminated mentions from tweet text
-            format source from html to iPhone, Android, Web, Other
-            format as datetime
-        '''
 
-        cols_to_keep = ['id', 'full_text', 'source', 'entities', 'user', 'lang']
+        '''
 
         if self.chunk:
             # select english tweets
             for chunk_id, chunk in enumerate(self.df_chunk_iter):
-                # Subset columns
-                chunk = chunk[cols_to_keep]
+                # Subset tweet cols
+                chunk = self._subset_tweets(chunk)
 
-                # Select english tweets
-                chunk = chunk[chunk['lang'] == 'en']
+                # Apply sentiment analysis
+                chunk = self._sentiment_score_tweets(chunk)
 
-                # Drop duplicate tweets
-                chunk.drop_duplicates(subset='id', ignore_index=True, inplace=True)
+                # Placeholder for attack/non-attack classifier
+                chunk = self._id_attack_tweets(chunk)
 
-                # Grab user description
-                chunk['user_desc'] = [chunk['user'][ind].get('description') for ind in range(len(chunk))]
-                # chunk = chunk[chunk['user_desc'] != '']
-
-                # Grab hashtags
-                chunk['hashtags'] = [chunk['entities'][ind].get('hashtags') for ind in range(len(chunk))]
-
-                # Return chunk
 
                 # print update
                 print(f'Cleaning chunks:\t{chunk_id+1} of {(self.chunk_size // len(chunk))+1} clean')
 
         else:
-            # select english tweets
-            self.df_all = self.df_all[self.df_all['lang'] == 'en']
+            self.df_raw = self._subset_tweets(self.df_raw)
+            
+            self.df_raw = self._sentiment_score_tweets(self.df_raw)
 
-            # dropping duplicates
-            self.df_all.drop_duplicates(subset='id', ignore_index=True, inplace=True)
+            self.df_raw = self._id_attack_tweets(self.df_raw)
 
-            # Eliminating mentions, dropping 
-            range_as_tuple = self.df_all['display_text_range'].apply(self._format_text_range) 
-            self.df_all['tweet_text_wo_mentions'] = self._no_mentions_text(
-                range_as_tuple,
-                self.df_all['full_text']
-            )
-            self.df_all.drop(['display_text_range'], axis=1, inplace=True)  
 
-            # formatting source
-            self.df_all['source_text'] = self.df_all['source'].apply(lambda x: self._get_atag_text(x))
-            self.df_all.drop('source', axis=1, inplace=True)
-            source_class_dict = {'Twitter for iPhone': 'iPhone', 'Twitter for Android': 'Android',
-                        'Twitter Web App': 'Web', 'Twitter for iPad': 'iPad'}
-            self.df_all['source_text'] = self.df_all['source_text'].replace(source_class_dict)
-            self.df_all['source_text'].where(
-                self.df_all['source_text'].apply(lambda x: x in source_class_dict.values()),
-                'Other',
-                inplace=True
-            )
+    def _id_attack_tweets(self, df):
+        '''
+        Apply algorithm to classify tweets as attack/non-attack
+        '''
+        # Placeholder for now - replace with ML algo later (11/1, 3:20pm MDT)
+        df['is_attack'] = np.random.randint(0,1,size=(len(df),1))
+        return df
 
-            # format datetime cols
-            self.df_all['tweet_date_created'] = pd.to_datetime(self.df_all['created_at'])
+    def _sentiment_score_tweets(self, df):
+        '''
+        Apply VADER algo to tweet text, returns only compount score
+        '''
+        analyzer = SentimentIntensityAnalyzer()
+        df['vader_sentiment'] = df.apply(lambda x: (analyzer.polarity_scores(x)).get('compound'))
+        return df
 
     def _subset_tweets(self, df):
         '''
@@ -148,41 +129,7 @@ class pipelineToPandas():
         # Grab hashtags
         df['hashtags'] = [df['entities'][ind].get('hashtags') for ind in range(len(df))]
 
-        
-
-    def _get_atag_text(self, tweet_text):
-        a_tag = BeautifulSoup(tweet_text).find('a')
-        if type(a_tag) == str:
-            return a_tag.getText()
-
-    def _format_text_range(self, raw_range):
-        '''
-        Formats str tweet_range as tuple if present, otherwise leave as nan
-        '''
-        if type(raw_range) == str: 
-            start, end = ''.join([char for char in raw_range if char not in ['[', ',', ']']]).split(' ')
-            return (int(start), int(end))
-        else:
-            return raw_range
-
-    # Doesn't work yet 10/29
-
-    def _no_mentions_text(self, tup_range_series, raw_tweet_text_series):
-        wo_mentions = np.empty(raw_tweet_text_series.shape, dtype='U256')
-        for idx, tup in enumerate(tup_range_series):
-            if type(tup) == tuple:
-                wo_mentions[idx] = raw_tweet_text_series[idx][tup[0]:tup[1]]
-            else:
-                wo_mentions[idx] = raw_tweet_text_series[idx]
-        return wo_mentions
-    
-    # def save_to_csv(self, csv_file_name, all=True):
-    #     now_date = str(datetime.now()).split(' ')[0]
-    #     file_path = f'{self.base_path}{now_date}_{csv_file_name}'
-    #     if all:
-    #         self.df_all.to_csv(file_path, index=False)
-    #     else:
-    #         self.pandas_df.to_csv(file_path, index=False)
+        return df
         
 
 if __name__ == "__main__":
