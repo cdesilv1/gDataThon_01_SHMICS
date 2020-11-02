@@ -76,14 +76,13 @@ class tweetCleaner():
                 # Apply sentiment analysis
                 chunk = self._sentiment_score_tweets(chunk)
 
-                # Placeholder for attack/non-attack classifier
-                chunk = self._id_attack_tweets(chunk)
+                # # Placeholder for attack/non-attack classifier
+                # chunk = self._id_attack_tweets(chunk)
 
                 # Placeholder for proTrump/proBiden scorer
                 chunk = self._partisan_score(chunk)
 
                 # Filter tweets to subpopulations
-
 
 
                 # print update
@@ -114,18 +113,21 @@ class tweetCleaner():
         proBiden_mask = df['partisan_score'] < -partisan_thresh
         negSent_mask = df['vader_sentiment'] < -sentiment_thresh
 
-        proAttack = df['is_attack'] == 1
-
         # Population combos
         mask_dict = {
             'proTrump': (proTrump_mask & posSent_mask) & (proBiden_mask & negSent_mask),
             'proBiden': (proTrump_mask & negSent_mask) & (proBiden_mask & posSent_mask),
-            'proTrump_attack': (proTrump_mask & proAttack),
-            'proBiden_attack': (proBiden_mask & proAttack)
         }
 
-        # Write to jsonl files
+
+        '''
+        To finish pipeline, 1/1, 6:30pm, Connor:
+            - Add Trevor model to classify proTrump/proBiden
+            - Export subpopulations as json files to GH
+        '''
         
+        # Write to jsonl files
+
     def _partisan_score(self, df):
         '''
         Apply algoritm to score tweet partisanship.
@@ -176,6 +178,5 @@ class tweetCleaner():
         
 
 if __name__ == "__main__":
-    pipeline = pipelineToPandas()
     pipeline.load_json('concatenated_abridged.jsonl')
     pipeline.clean_df()
