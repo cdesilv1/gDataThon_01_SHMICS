@@ -64,7 +64,7 @@ class tweetCleaner():
     
     def clean_df(self):
         '''
-
+        Remove unwanted fields from tweets, add engineered features.
         '''
 
         if self.chunk:
@@ -79,6 +79,12 @@ class tweetCleaner():
                 # Placeholder for attack/non-attack classifier
                 chunk = self._id_attack_tweets(chunk)
 
+                # Placeholder for proTrump/proBiden scorer
+                chunk = self._partisan_score(chunk)
+
+                # Filter tweets to subpopulations
+
+
 
                 # print update
                 print(f'Cleaning chunks:\t{chunk_id+1} of {(self.chunk_size // len(chunk))+1} clean')
@@ -90,6 +96,43 @@ class tweetCleaner():
 
             self.df_raw = self._id_attack_tweets(self.df_raw)
 
+            self.df_raw = self._partisan_score(self.df_raw)
+
+
+    def _write_to_subpopulations(self, df, partisan_thresh=1, sentiment_thresh=0.5):
+        '''
+        Filter DF by partisanship and sentiment: (populations subject to change)
+            - Population 1 (proTrump): proTrump/positiveSent & proBiden/negativeSent
+            - Population 2 (proBiden): proTrump/negativeSent & proBiden/positiveSent
+            - Population 3 (proTrump Attack): proTrump/attack
+            - Population 4 (proBiden Attack): proBiden/attack
+        '''
+        # make masks
+        proTrump_mask = df['partisan_score'] > partisan_thresh
+        posSent_mask = df['vader_sentiment'] > sentiment_thresh
+
+        proBiden_mask = df['partisan_score'] < -partisan_thresh
+        negSent_mask = df['vader_sentiment'] < -sentiment_thresh
+
+        proAttack = df['is_attack'] == 1
+
+        # Population combos
+        mask_dict = {
+            'proTrump': (proTrump_mask & posSent_mask) & (proBiden_mask & negSent_mask),
+            'proBiden': (proTrump_mask & negSent_mask) & (proBiden_mask & posSent_mask),
+            'proTrump_attack': (proTrump_mask & proAttack),
+            'proBiden_attack': (proBiden_mask & proAttack)
+        }
+
+        # Write to jsonl files
+        
+    def _partisan_score(self, df):
+        '''
+        Apply algoritm to score tweet partisanship.
+        '''
+        # Placeholder for now - replace with ML algo later (11/1, 3:20pm MDT)
+        df['partisan_score'] = np.random.randint(-10,10, size=(len(df),1))
+        return df
 
     def _id_attack_tweets(self, df):
         '''
