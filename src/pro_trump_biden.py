@@ -1,3 +1,4 @@
+#%%
 import nltk
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -51,3 +52,8 @@ def result(s,thresh_trump=0.5,thresh_biden=0.7):
         return 'trump'
     elif j<=thresh_trump and k>=thresh_biden:
         return 'biden'
+    else:
+        return 'neither'
+# %%
+result('chris wallace is an idiot!')
+# %%
