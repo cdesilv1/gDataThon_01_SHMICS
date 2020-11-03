@@ -92,6 +92,7 @@ class tweetCleaner():
             df_copy = df[mask]
             with open(f'{proc_file_dir}/{fname}', 'a') as f:
                 f.writelines(df_copy.to_json(orient='records', lines=True))
+                f.writelines('\n')
             
 
     def _partisan_score(self, df):
