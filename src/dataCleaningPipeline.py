@@ -2,12 +2,20 @@
 from datetime import datetime
 import re
 import os
+import pickle
 
 # External libraries
 import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import nltk
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+stop_words = set(stopwords.words('english')) 
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
 
 class tweetCleaner():
     '''
