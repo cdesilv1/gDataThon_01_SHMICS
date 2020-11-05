@@ -9,10 +9,6 @@ import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import nltk
-from nltk.tokenize import RegexpTokenizer
-from nltk.corpus import stopwords
-stop_words = set(stopwords.words('english')) 
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -107,9 +103,23 @@ class tweetCleaner():
         '''
         Apply algoritm to score tweet partisanship.
         '''
+        self._load_partisan_models()
+
+        df['biden_proba'] = 
+
+
         # Placeholder for now - replace with ML algo later (11/1, 3:20pm MDT)
         df['partisan_score'] = np.random.randint(0,1, size=(len(df),1))
         return df
+
+    def _vectorize_tweet_text(self)
+    
+    def _load_partisan_models(self, classifier=MultinomialNB, training_date='20_11_05'):
+        '''
+        Load partisan scoring models.
+        '''
+        self.biden_model = pickle.load(open(f'../models/NB_biden_{training_date}.sav', 'rb'))
+        self.trump_model = pickle.load(open(f'../models/NB_trump_{training_date}.sav', 'rb'))
 
     def _sentiment_score_tweets(self, df):
         '''
@@ -145,6 +155,8 @@ class tweetCleaner():
         df.drop(['user', 'lang', 'entities'], axis=1, inplace=True)
 
         return df
+
+    
         
 
 if __name__ == "__main__":

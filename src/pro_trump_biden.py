@@ -9,6 +9,7 @@ import numpy as np
 vectorizer_trump = TfidfVectorizer(max_features=5000)
 vectorizer_biden = TfidfVectorizer(max_features=5000)
 
+
 X_biden=pd.read_csv('biden_data.csv')['0']
 X_trump=pd.read_csv('trump_data.csv')['0']
 
