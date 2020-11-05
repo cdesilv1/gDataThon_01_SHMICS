@@ -112,7 +112,11 @@ class tweetCleaner():
         df['partisan_score'] = np.random.randint(0,1, size=(len(df),1))
         return df
 
-    def _vectorize_tweet_text(self)
+    def _vectorize_tweet_text(self, stop_words_file='stop_words.csv')
+        '''
+        Vectorize tweet text for both 
+        '''
+        stop_words = pd.read_csv('stop_words.csv',header=None)[0].to_list() 
     
     def _load_partisan_models(self, classifier=MultinomialNB, training_date='20_11_05'):
         '''
