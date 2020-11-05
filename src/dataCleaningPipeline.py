@@ -70,7 +70,7 @@ class tweetCleaner():
 
             # print update
             print(f'Entire file loaded and cleaned')
-
+            
     def _write_to_subpopulations(self, df, proc_file_dir, sentiment_thresh=0.5):
         '''
         Filter DF by partisanship and sentiment: (populations subject to change)
@@ -97,7 +97,6 @@ class tweetCleaner():
             with open(f'{proc_file_dir}/{fname}', 'a') as f:
                 f.writelines(df_copy.to_json(orient='records', lines=True))
                 f.writelines('\n')
-            
 
     def _partisan_score(self, df):
         '''
