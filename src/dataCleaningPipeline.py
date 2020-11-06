@@ -13,6 +13,9 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
+# Other py files
+from TextCleaner import TextCleaner
+
 class tweetCleaner():
     '''
     Class that performs ETL from datalake json file to structured dataframe.
@@ -106,7 +109,7 @@ class tweetCleaner():
 
 
 
-        df['biden_proba'] = 
+        # df['biden_proba'] = 
 
         return model_trump.predict_proba(vec_trump)[0][1],model_biden.predict_proba(vec_biden)[0][1]
 
@@ -115,22 +118,30 @@ class tweetCleaner():
         df['partisan_score'] = np.random.randint(0,1, size=(len(df),1))
         return df
 
-    def _vectorize_tweet_text(self, df)
+    def _vectorize_tweet_text(self, df):
         '''
         Vectorize tweet text for both 
         '''
+        # grab tweet text, and clean it
+        cleaner = TextCleaner()
+        df['clean_tweet_text'] = df['full_text'].apply(lambda x: cleaner.clean_tweets(x,6))
+        
         # load stopwords
         stop_words = pd.read_csv(f'../models/stop_words.csv',header=None)[0].to_list()
 
-        
-        s=s.split('http')[0]
-        s=' '.join([i.lower() for i in s.split() if i not in stop_words])
-        s= re.sub(r'[^\w\s]','',s)
-        s_trump=' '.join([i for i in s.split() if i in vectorizer_trump.vocabulary_.keys()])
-        s_biden=' '.join([i for i in s.split() if i in vectorizer_biden.vocabulary_.keys()])
+        # Collect trump/biden vocab tweets
+        for tweet in df['clean_tweet_text']:
+            tweet = ' '.join([i.lower() for i in tweet.split() if i not in stop_words])
+            tweet =  re.sub(r'[^\w\s]','',tweet)
+            
+            df['trump_text'] = ' '.join([i for i in tweet.split() if i in self.trump_vectorizer.vocabulary_.keys()])
+            df['biden_text'] = ' '.join([i for i in tweet.split() if i in self.biden_vectorizer.vocabulary_.keys()])
+
+        breakpoint()
 
         vec_trump=vectorizer_trump.transform([s_trump])
         vec_biden=vectorizer_biden.transform([s_biden])
+        return vec_biden, vec_trump
     
     def _load_partisan_models(self, classifier=MultinomialNB, training_date='20_11_05'):
         '''
@@ -183,4 +194,10 @@ class tweetCleaner():
 if __name__ == "__main__":
     pipeline = tweetCleaner()
     pipeline.load_json('concatenated_abridged.jsonl')
-    pipeline.clean_df('../data/proc_jsons')
+    # pipeline.clean_df('../data/proc_jsons')
+
+    pipeline._load_partisan_models()
+
+    for chunk_id, chunk in enumerate(pipeline.df_chunk_iter):
+        if chunk_id == 0:
+            vec_biden, vec_trump = pipeline._vectorize_tweet_text(chunk)
