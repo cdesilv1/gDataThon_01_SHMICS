@@ -16,7 +16,7 @@ def get_fnames_helper()->list:
     with open('count_logger.json', 'r') as fread:
         read_json = json.load(fread)
         fnames = list(read_json.keys())
-        return fnames
+    return fnames
 
 def make_tweet(api, filenames:list=get_fnames_helper()):
     logger.info("Deciding on tweet type to post")
