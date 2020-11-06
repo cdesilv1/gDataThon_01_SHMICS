@@ -55,7 +55,8 @@ class tweetCleaner():
 
                 # Placeholder for proTrump/proBiden scorer
                 chunk = self._partisan_score(chunk)
-
+                print(chunk['partisan_score'].sum()/len(chunk))
+                breakpoint()
                 # Filter tweets to subpopulations
                 self._write_to_subpopulations(chunk, proc_file_dir)
 
@@ -101,21 +102,19 @@ class tweetCleaner():
                 f.writelines(df_copy.to_json(orient='records', lines=True))
                 f.writelines('\n')
 
-    def _partisan_score(self, df):
+    def _partisan_score(self, df, biden_thresh=0.7, trump_thresh=0.5):
         '''
         Apply algoritm to score tweet partisanship.
         '''
         self._load_partisan_models()
 
+        X = self._vectorize_tweet_text(df)
 
+        df['biden_proba'] = self.biden_model.predict_proba(X)[:, 1] - biden_thresh
+        df['trump_proba'] = self.trump_model.predict_proba(X)[:, 1] - trump_thresh
+        
+        df['partisan_score'] = (df['trump_proba'] > df['biden_proba']).astype(int)
 
-        # df['biden_proba'] = 
-
-        return model_trump.predict_proba(vec_trump)[0][1],model_biden.predict_proba(vec_biden)[0][1]
-
-
-        # Placeholder for now - replace with ML algo later (11/1, 3:20pm MDT)
-        df['partisan_score'] = np.random.randint(0,1, size=(len(df),1))
         return df
 
     def _vectorize_tweet_text(self, df):
@@ -126,22 +125,8 @@ class tweetCleaner():
         cleaner = TextCleaner()
         df['clean_tweet_text'] = df['full_text'].apply(lambda x: cleaner.clean_tweets(x,6))
         
-        # load stopwords
-        stop_words = pd.read_csv(f'../models/stop_words.csv',header=None)[0].to_list()
-
-        # Collect trump/biden vocab tweets
-        for tweet in df['clean_tweet_text']:
-            tweet = ' '.join([i.lower() for i in tweet.split() if i not in stop_words])
-            tweet =  re.sub(r'[^\w\s]','',tweet)
-            
-            df['trump_text'] = ' '.join([i for i in tweet.split() if i in self.trump_vectorizer.vocabulary_.keys()])
-            df['biden_text'] = ' '.join([i for i in tweet.split() if i in self.biden_vectorizer.vocabulary_.keys()])
-
-        breakpoint()
-
-        vec_trump=vectorizer_trump.transform([s_trump])
-        vec_biden=vectorizer_biden.transform([s_biden])
-        return vec_biden, vec_trump
+        # Vectorize tweets
+        return self.vectorizer.transform(df['clean_tweet_text'])
     
     def _load_partisan_models(self, classifier=MultinomialNB, training_date='20_11_05'):
         '''
@@ -150,8 +135,7 @@ class tweetCleaner():
         self.biden_model = pickle.load(open(f'../models/NB_biden_{training_date}.sav', 'rb'))
         self.trump_model = pickle.load(open(f'../models/NB_trump_{training_date}.sav', 'rb'))
 
-        self.biden_vectorizer = pickle.load(open(f'../models/vectorizer_biden_{training_date}.sav', 'rb'))
-        self.trump_vectorizer = pickle.load(open(f'../models/vectorizer_trump_{training_date}.sav', 'rb'))
+        self.vectorizer = pickle.load(open(f'../models/vectorizer_{training_date}.sav', 'rb'))
 
     def _sentiment_score_tweets(self, df):
         '''
@@ -194,10 +178,4 @@ class tweetCleaner():
 if __name__ == "__main__":
     pipeline = tweetCleaner()
     pipeline.load_json('concatenated_abridged.jsonl')
-    # pipeline.clean_df('../data/proc_jsons')
-
-    pipeline._load_partisan_models()
-
-    for chunk_id, chunk in enumerate(pipeline.df_chunk_iter):
-        if chunk_id == 0:
-            vec_biden, vec_trump = pipeline._vectorize_tweet_text(chunk)
+    pipeline.clean_df('../data/proc_jsons')
