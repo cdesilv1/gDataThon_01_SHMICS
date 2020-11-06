@@ -70,7 +70,7 @@ class tweetCleaner():
 
             # print update
             print(f'Entire file loaded and cleaned')
-            
+
     def _write_to_subpopulations(self, df, proc_file_dir, sentiment_thresh=0.5):
         '''
         Filter DF by partisanship and sentiment: (populations subject to change)
@@ -104,18 +104,33 @@ class tweetCleaner():
         '''
         self._load_partisan_models()
 
+
+
         df['biden_proba'] = 
+
+        return model_trump.predict_proba(vec_trump)[0][1],model_biden.predict_proba(vec_biden)[0][1]
 
 
         # Placeholder for now - replace with ML algo later (11/1, 3:20pm MDT)
         df['partisan_score'] = np.random.randint(0,1, size=(len(df),1))
         return df
 
-    def _vectorize_tweet_text(self, stop_words_file='stop_words.csv')
+    def _vectorize_tweet_text(self, df)
         '''
         Vectorize tweet text for both 
         '''
-        stop_words = pd.read_csv('stop_words.csv',header=None)[0].to_list() 
+        # load stopwords
+        stop_words = pd.read_csv(f'../models/stop_words.csv',header=None)[0].to_list()
+
+        
+        s=s.split('http')[0]
+        s=' '.join([i.lower() for i in s.split() if i not in stop_words])
+        s= re.sub(r'[^\w\s]','',s)
+        s_trump=' '.join([i for i in s.split() if i in vectorizer_trump.vocabulary_.keys()])
+        s_biden=' '.join([i for i in s.split() if i in vectorizer_biden.vocabulary_.keys()])
+
+        vec_trump=vectorizer_trump.transform([s_trump])
+        vec_biden=vectorizer_biden.transform([s_biden])
     
     def _load_partisan_models(self, classifier=MultinomialNB, training_date='20_11_05'):
         '''
@@ -123,6 +138,9 @@ class tweetCleaner():
         '''
         self.biden_model = pickle.load(open(f'../models/NB_biden_{training_date}.sav', 'rb'))
         self.trump_model = pickle.load(open(f'../models/NB_trump_{training_date}.sav', 'rb'))
+
+        self.biden_vectorizer = pickle.load(open(f'../models/vectorizer_biden_{training_date}.sav', 'rb'))
+        self.trump_vectorizer = pickle.load(open(f'../models/vectorizer_trump_{training_date}.sav', 'rb'))
 
     def _sentiment_score_tweets(self, df):
         '''

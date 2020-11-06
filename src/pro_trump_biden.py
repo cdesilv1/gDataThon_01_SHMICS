@@ -2,22 +2,9 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
 import pandas as pd
-stop_words = pd.read_csv('stop_words.csv',header=None)[0].to_list() 
+# stop_words = pd.read_csv('stop_words.csv',header=None)[0].to_list() 
 from sklearn.naive_bayes import MultinomialNB
 import numpy as np
-
-vectorizer_trump = TfidfVectorizer(max_features=5000)
-vectorizer_biden = TfidfVectorizer(max_features=5000)
-
-
-X_biden=pd.read_csv('biden_data.csv')['0']
-X_trump=pd.read_csv('trump_data.csv')['0']
-
-model_biden = pickle.load(open('NB_biden.sav', 'rb'))
-model_trump = pickle.load(open('NB_trump.sav', 'rb'))
-
-vectorizer_trump.fit(X_trump)
-vectorizer_biden.fit(X_biden)
 
 def predict_(s):
     s=s.split('http')[0]
@@ -39,3 +26,21 @@ def result(s,thresh_trump=0.5,thresh_biden=0.7):
         return 'biden'
     else:
         return 'neither'
+
+if __name__ == "__main__":
+    vectorizer_trump = TfidfVectorizer(max_features=5000)
+    vectorizer_biden = TfidfVectorizer(max_features=5000)
+
+
+    X_biden=pd.read_csv('biden_data.csv')['0']
+    X_trump=pd.read_csv('trump_data.csv')['0']
+
+    vectorizer_trump.fit(X_trump)
+    vectorizer_biden.fit(X_biden)
+
+    with open('../models/vectorizer_biden_20_11_05.sav', 'wb') as f:
+        pickle.dump(vectorizer_biden,f)
+
+
+    with open('../models/vectorizer_trump_20_11_05.sav', 'wb') as f:
+        pickle.dump(vectorizer_trump,f)
