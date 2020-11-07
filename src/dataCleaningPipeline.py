@@ -22,6 +22,8 @@ class tweetCleaner():
     '''
     def __init__(self):
         self.base_path = '../data/'
+        self.biden_model = None
+        self.trump_model = None
 
     def load_json(self, fname, chunk=True, chunk_size = 10000):
         '''
@@ -43,7 +45,6 @@ class tweetCleaner():
         '''
         Remove unwanted fields from tweets, add engineered features, writes to new jsonl files.
         '''
-
         if self.chunk:
             # select english tweets
             for chunk_id, chunk in enumerate(self.df_chunk_iter):
@@ -55,8 +56,7 @@ class tweetCleaner():
 
                 # Placeholder for proTrump/proBiden scorer
                 chunk = self._partisan_score(chunk)
-                print(chunk['partisan_score'].sum()/len(chunk))
-                breakpoint()
+
                 # Filter tweets to subpopulations
                 self._write_to_subpopulations(chunk, proc_file_dir)
 
@@ -81,17 +81,24 @@ class tweetCleaner():
             - Population 1 (proTrump): proTrump/positiveSent & proBiden/negativeSent
             - Population 2 (proBiden): proTrump/negativeSent & proBiden/positiveSent
         '''
+        '''     Use block below to include sentiment conditional
         # make masks
         proTrump_mask = df['partisan_score'] == 1
         posSent_mask = df['vader_sentiment'] > sentiment_thresh
 
-        proBiden_mask = df['partisan_score'] == 0
+        proBiden_mask = df['partisan_score'] == -1
         negSent_mask = df['vader_sentiment'] < -sentiment_thresh
 
         # Population combos
         mask_dict = {
             'proTrump': (proTrump_mask & posSent_mask) | (proBiden_mask & negSent_mask),
             'proBiden': (proTrump_mask & negSent_mask) | (proBiden_mask & posSent_mask),
+        }
+        '''
+
+        mask_dict = {
+            'proTrump': df['partisan_score'] == 1,
+            'proBiden': df['partisan_score'] == 0
         }
 
         # Write to jsonl files
@@ -104,16 +111,20 @@ class tweetCleaner():
 
     def _partisan_score(self, df, biden_thresh=0.7, trump_thresh=0.5):
         '''
-        Apply algoritm to score tweet partisanship.
+        Apply algoritm to score tweet partisanship. Trump = 1, Biden = -1, neutral = 0.
         '''
-        self._load_partisan_models()
+        if self.biden_model == None:
+            self._load_partisan_models()
 
         X = self._vectorize_tweet_text(df)
 
-        df['biden_proba'] = self.biden_model.predict_proba(X)[:, 1] - biden_thresh
-        df['trump_proba'] = self.trump_model.predict_proba(X)[:, 1] - trump_thresh
+        df['biden_proba'] = self.biden_model.predict_proba(X)[:, 1]
+        df['trump_proba'] = self.trump_model.predict_proba(X)[:, 1]
         
-        df['partisan_score'] = (df['trump_proba'] > df['biden_proba']).astype(int)
+        trump_scored = (df['trump_proba'] > trump_thresh).astype(int)
+        biden_scored = (df['biden_proba'] > biden_thresh).astype(int)
+
+        df['partisan_score'] = trump_scored - biden_scored
 
         return df
 
