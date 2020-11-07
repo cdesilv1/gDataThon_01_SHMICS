@@ -98,18 +98,20 @@ class tweetCleaner():
 
         mask_dict = {
             'proTrump': df['partisan_score'] == 1,
-            'proBiden': df['partisan_score'] == 0
+            'proBiden': df['partisan_score'] == -1
         }
 
         # Write to jsonl files
         for population, mask in mask_dict.items():
-            fname = f'{population}_sentiment_thresh_{sentiment_thresh}.jsonl'
+            fname = f'{population}_preGPT2.jsonl'
             df_copy = df[mask]
+            df_copy['index'] = df_copy.index
+            df_copy = df_copy[['index', 'full_text']]
             with open(f'{proc_file_dir}/{fname}', 'a') as f:
                 f.writelines(df_copy.to_json(orient='records', lines=True))
                 f.writelines('\n')
 
-    def _partisan_score(self, df, biden_thresh=0.7, trump_thresh=0.5):
+    def _partisan_score(self, df, biden_thresh=0.8, trump_thresh=0.5):
         '''
         Apply algoritm to score tweet partisanship. Trump = 1, Biden = -1, neutral = 0.
         '''
