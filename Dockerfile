@@ -5,7 +5,19 @@ COPY bot_scripts/tweet.py /bots/
 COPY bot_scripts/count_logger.json /bots/
 COPY requirements.txt /tmp
 RUN apk add curl
+RUN apk add pkgconfig
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    glib-dev \
+    gobject-introspection-dev \
+    cairo-dev \
+    cairo \
+    cairo-tools
 RUN pip3 install -r /tmp/requirements.txt
+RUN apk del .build-deps
 
 RUN wget https://github.com/tanaikech/goodls/releases/download/v1.2.7/goodls_linux_amd64
 RUN chmod +x ./goodls_linux_amd64
