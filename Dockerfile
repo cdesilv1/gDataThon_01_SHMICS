@@ -11,10 +11,10 @@ RUN wget https://github.com/tanaikech/goodls/releases/download/v1.2.7/goodls_lin
 RUN chmod +x ./goodls_linux_amd64
 
 # REPLACE WITH GENERATED PROBIDEN JSON url
-RUN ./goodls_linux_amd64 -f probiden.json -u https://drive.google.com/file/d/1K_zaeE48eD-C1KEFReGQ3Bvr8vs6LFHe/view?usp=sharing
+RUN ./goodls_linux_amd64 -f probiden.json -u https://drive.google.com/file/d/1ErGTyGntUIM6OnMgW1f18WU51fY7TN1H/view?usp=sharing
 
 # REPLACE WITH GENERATED PROTRUMP JSON url
-RUN ./goodls_linux_amd64 -f protrump.json -u https://drive.google.com/file/d/1K_zaeE48eD-C1KEFReGQ3Bvr8vs6LFHe/view?usp=sharing
+RUN ./goodls_linux_amd64 -f protrump.json -u https://drive.google.com/file/d/1aQuMi6hLnpDO3Y90eQgVO3fNGtMNKFg8/view?usp=sharing
 
 # moving generated files to workdir
 RUN mv probiden.json /bots/probiden.json
