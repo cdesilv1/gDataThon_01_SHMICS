@@ -26,10 +26,11 @@ def make_tweet(api, filenames: list = get_fnames_helper()):
 
     # pop to cycle through files if one has been iterated through completely
     def select_tweet(filenames=filenames) -> str:
-        file_to_select_from = random.shuffle(list(range(len(filenames))))
+        files_to_select_from = list(range(len(filenames)))
+        random.shuffle(files_to_select_from)
 
-        while file_to_select_from:
-            current_f = filenames[file_to_select_from.pop()]
+        while files_to_select_from:
+            current_f = filenames[files_to_select_from.pop()]
 
             # reading next idx of selected file
             with open("count_logger.json", "r") as reading_json:
@@ -56,7 +57,7 @@ def make_tweet(api, filenames: list = get_fnames_helper()):
                 # write the next idx of selected file
                 read_json_ct_logger[current_f] += 1
                 with open("count_logger.json", "w") as fwrite:
-                    fwrite(json.dumps(read_json_ct_logger))
+                    fwrite.write(json.dumps(read_json_ct_logger))
 
                 return tweet_content
 

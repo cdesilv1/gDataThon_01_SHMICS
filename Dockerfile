@@ -15,24 +15,28 @@ RUN apk add --no-cache --virtual .build-deps \
     gobject-introspection-dev \
     cairo-dev \
     cairo \
-    cairo-tools
+    cairo-tools \
+    py3-cairo-dev
 RUN pip3 install -r /tmp/requirements.txt
+
+# probiden
+ARG fileid="1ErGTyGntUIM6OnMgW1f18WU51fY7TN1H"
+ARG filename="probiden.json"
+RUN curl -c ./cookie -s -L "https://drive.google.com/uc?export=download&id=${fileid}" > /dev/null
+RUN curl -Lb ./cookie "https://drive.google.com/uc?export=download&confirm=`awk '/download/ {print $NF}' ./cookie`&id=${fileid}" -o ${filename}
+
+# protrump
+ARG fileid="1aQuMi6hLnpDO3Y90eQgVO3fNGtMNKFg8"
+ARG filename="protrump.json"
+RUN curl -c ./cookie -s -L "https://drive.google.com/uc?export=download&id=${fileid}" > /dev/null
+RUN curl -Lb ./cookie "https://drive.google.com/uc?export=download&confirm=`awk '/download/ {print $NF}' ./cookie`&id=${fileid}" -o ${filename}
+
+# remove build deps
 RUN apk del .build-deps
-
-RUN wget https://github.com/tanaikech/goodls/releases/download/v1.2.7/goodls_linux_amd64
-RUN chmod +x ./goodls_linux_amd64
-
-# REPLACE WITH GENERATED PROBIDEN JSON url
-RUN ./goodls_linux_amd64 -f probiden.json -u https://drive.google.com/file/d/1ErGTyGntUIM6OnMgW1f18WU51fY7TN1H/view?usp=sharing
-
-# REPLACE WITH GENERATED PROTRUMP JSON url
-RUN ./goodls_linux_amd64 -f protrump.json -u https://drive.google.com/file/d/1aQuMi6hLnpDO3Y90eQgVO3fNGtMNKFg8/view?usp=sharing
 
 # moving generated files to workdir
 RUN mv probiden.json /bots/probiden.json
 RUN mv protrump.json /bots/protrump.json
-
-RUN rm goodls_linux_amd64
 
 WORKDIR /bots
 CMD ["python3", "tweet.py"]
