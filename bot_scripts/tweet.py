@@ -45,17 +45,43 @@ def make_tweet(api, filenames: list = get_fnames_helper()):
             with open(current_f, "r") as fread:
                 read_json = json.load(fread)
                 try:
-                    tweet_content = read_json[next_idx_current_file]
-                    find_bw_re = r"\<\|startoftext\|\>(.*?)\<\|endoftext\|\>"
-                    tweet_content = re.findall(find_bw_re, tweet_content)
-                    tweet_content = tweet_content[0]
+
+                    def _recursive_helper(
+                        read_json,
+                        next_idx_current_file,
+                        recursive_iterator=0,
+                        idx_max=5000,
+                    ):
+                        find_bw_re = r"\<\|startoftext\|\>(.*?)\<\|endoftext\|\>"
+                        tweet_content = read_json[
+                            str(next_idx_current_file + recursive_iterator)
+                        ]
+                        found_content = re.findall(find_bw_re, tweet_content)
+                        if next_idx_current_file + recursive_iterator <= idx_max:
+                            if found_content:
+                                return (
+                                    found_content[0],
+                                    next_idx_current_file + recursive_iterator,
+                                )
+                            else:
+                                return _recursive_helper(
+                                    read_json=read_json,
+                                    next_idx_current_file=next_idx_current_file,
+                                    recursive_iterator=recursive_iterator + 1,
+                                )
+                        else:
+                            return "Sorry, we're out of fresh tweets.", 5000
+
+                    tweet_content, current_idx = _recursive_helper(
+                        read_json=read_json, next_idx_current_file=next_idx_current_file
+                    )
                     found_new_tweet = True
                 except:
                     logger.info("file: {} is out of tweets".format(current_f))
 
             if found_new_tweet:
                 # write the next idx of selected file
-                read_json_ct_logger[current_f] += 1
+                read_json_ct_logger[current_f] = current_idx
                 with open("count_logger.json", "w") as fwrite:
                     fwrite.write(json.dumps(read_json_ct_logger))
 
@@ -77,7 +103,8 @@ def main():
     api = create_api()
     while True:
         make_tweet(api)
-        time.sleep(3600)
+        sleep_time = random.randint(2400, 3600)
+        time.sleep(sleep_time)
 
 
 if __name__ == "__main__":
