@@ -94,7 +94,7 @@ def make_tweet(api, filenames: list = get_fnames_helper()):
 
             if found_new_tweet:
                 # write the next idx of selected file
-                read_json_ct_logger[current_f] = current_idx
+                read_json_ct_logger[current_f] = current_idx + 1
                 with open("count_logger.json", "w") as fwrite:
                     fwrite.write(json.dumps(read_json_ct_logger))
 
