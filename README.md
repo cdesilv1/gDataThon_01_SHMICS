@@ -16,5 +16,5 @@ The 5-fold cross-validation performance is as follows:
 
 We see a reasonably good precision for both models, which is at least useful to helping ensure a low false-positive rate. The recall is worse for the pro-Trump tweets, interestingly. 
 
-Knowing these models perform reasonably well to identify useful tweets for GPT-2 text generation, we trained the models on the entire dataset used for cross-validation and used it to identify pro-Trump or pro-Biden tweets in the original, larger dataset. 
+Knowing these models perform reasonably well to identify useful tweets, we trained the models on the entire dataset used for cross-validation and used it to identify pro-Trump or pro-Biden tweets in the original, larger dataset for GPT-2 text generation.
 
