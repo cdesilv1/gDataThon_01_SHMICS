@@ -4,8 +4,6 @@ Our group was not entirely happy with the ratio of vitriolic tweets (sum of twee
 
 To this end, we trained two classifiers: one that could detect pro-Biden tweets and one that could detect pro-Trump tweets. For each model, we did the following:
 
-<img src="modelling_performance.png" width=500></img>
-
 1. Created a set of tweets with any pro-Biden or pro-Trump hashtags
 2. Assigned a binary target variable: "1" if the tweet had more hashtags favoring a candidate more than the other; "0" if not
 3. Cleaned the tweets by removing hashtags, punctuation, stopwords, and converting to lowercase
@@ -14,6 +12,7 @@ To this end, we trained two classifiers: one that could detect pro-Biden tweets 
 
 The 5-fold cross-validation performance is as follows:
 
+<img src="modelling_performance.png" width=500></img>
 
 We see a reasonably good precision for both models, which is at least useful to helping ensure a low false-positive rate. The recall is worse for the pro-Trump tweets, interestingly. 
 
