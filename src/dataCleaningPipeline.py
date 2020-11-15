@@ -189,6 +189,42 @@ class tweetCleaner():
         
 
 if __name__ == "__main__":
+    '''
+    Steps to run the pipeline:
+    - Make sure project file structure is as below:
+
+        root/
+            |- data/
+                |- proc_jsons/
+            |- src/
+            |- models/
+
+    - Download raw tweet jsonl file to data folder, make sure 'dataCleaningPipeline.py' is in src
+    - You can run dataCleaningPipeline.py from src to clean tweet jsonl to 'proc_jsons/'
+    - Running that python file performs the following commands:
+        - Intantiates 'tweetCleaner', pipeline object
+        - Calls 'load_json' method from pipeline object, specifying 'raw' jsonl file name
+        - Calls 'clean_df' method from pipeline object, specifying location for processed jsonl files to be saved
+
+    - The 'load_json' method can be called with option to read file in chunks, to save memory space.
+    - The 'clean_df' method performs the following cleaning processes:
+        - Selects relevant fields from each tweet:
+            - Selects English tweets
+            - Keeps: Tweet ID, Tweet Text, User Description, and Tweet Hashtags
+        - Scores Tweet Text with Vader Sentiment Analyzer, keeps the compound sentiment score for each tweet
+        - Scores Tweet Text with political partisan model
+            - Loads Multinomial Nieve-Bayes Classifiers from pkl files located in 'models/' subdirectory
+            - Loads TF-IDF vectorizer from pkl file located in 'models/' subdirectory
+            - Cleans raw tweet text using custom text cleaner (located in src/TextCleaner.py), as classifiers were trained on 
+            tweets pre-processed with this cleaner
+            - Prediction probabilities for each NB classifier are applied to each tweet
+            - Probability thresholds are used to classify each tweet as ProBiden/Neutral/ProTrump, with 
+            a 'partisan score' of -1/0/1, respectively
+        - Tweets (fields: Tweet ID, Tweet Text) of ProBiden/ProTrump subpopulations are saved to processed jsonl files
+            - Output format '{proBiden or proTrump}_preGPT2.jsonl', in data/proc_jsons subdirectory
+    '''
+
     pipeline = tweetCleaner()
     pipeline.load_json('concatenated_abridged.jsonl')
     pipeline.clean_df('../data/proc_jsons')
+
